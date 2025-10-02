@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Currency Input Auto 2 Decimals</title>
+    <title>jQuery Currency Input Auto 2 Decimals</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
@@ -13,38 +14,36 @@
     <input type="text" id="currency-input" placeholder="0.00" />
 
     <script>
-        const input = document.getElementById('currency-input');
+        $(document).ready(function() {
+            function formatCurrency(value) {
+                // Remove all non-digit characters
+                value = value.replace(/\D/g, '');
 
-        function formatCurrency(value) {
-            // Remove all non-digit characters
-            value = value.replace(/\D/g, '');
+                // Parse as integer cents
+                let intValue = parseInt(value, 10);
+                if (isNaN(intValue)) intValue = 0;
 
-            // Parse value as integer cents
-            let intValue = parseInt(value, 10);
-            if (isNaN(intValue)) intValue = 0;
+                // Format number with commas and 2 decimals
+                return (intValue / 100).toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
 
-            // Convert to a fixed 2-decimal string
-            let formatted = (intValue / 100).toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
+            $('#currency-input').on('input', function() {
+                const $this = $(this);
+                const cursorPosition = this.selectionStart;
+                const oldLength = $this.val().length;
+
+                $this.val(formatCurrency($this.val()));
+
+                const newLength = $this.val().length;
+                this.selectionEnd = cursorPosition + (newLength - oldLength);
             });
 
-            return formatted;
-        }
-
-        input.addEventListener('input', (e) => {
-            const cursorPosition = e.target.selectionStart;
-            const oldLength = e.target.value.length;
-
-            e.target.value = formatCurrency(e.target.value);
-
-            // Adjust cursor position to the right place after formatting
-            const newLength = e.target.value.length;
-            e.target.selectionEnd = cursorPosition + (newLength - oldLength);
+            // Initialize input value
+            $('#currency-input').val(formatCurrency(''));
         });
-
-        // Initialize with 0.00
-        input.value = formatCurrency('');
     </script>
 
 </body>
